@@ -131,9 +131,36 @@ resource "aws_lambda_permission" "api_gateway_permission" {
   source_arn    = "${aws_api_gateway_rest_api.address_book_api.execution_arn}/*/*"
 }
 
+# Create a GET method for the /contacts endpoint
+resource "aws_api_gateway_method" "get_method" {
+  rest_api_id   = aws_api_gateway_rest_api.address_book_api.id
+  resource_id   = aws_api_gateway_resource.contacts.id
+  http_method   = "GET"
+  authorization = "NONE"
+}
+
+# Integrate the Lambda function with the GET method
+resource "aws_api_gateway_integration" "get_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.address_book_api.id
+  resource_id             = aws_api_gateway_resource.contacts.id
+  http_method             = aws_api_gateway_method.get_method.http_method
+  type                    = "AWS_PROXY"
+  integration_http_method = "POST"
+  uri                     = aws_lambda_function.crud_lambda.invoke_arn
+}
+
+# Grant API Gateway permission to invoke the Lambda function for GET method
+resource "aws_lambda_permission" "api_gateway_permission_get" {
+  statement_id  = "AllowAPIGatewayInvokeGet"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.crud_lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.address_book_api.execution_arn}/*/GET/contacts"
+}
+
 # Deploy the API Gateway
 resource "aws_api_gateway_deployment" "deployment" {
-  depends_on   = [aws_api_gateway_integration.lambda_integration]
+  depends_on   = [aws_api_gateway_integration.lambda_integration, aws_api_gateway_integration.get_integration]
   rest_api_id  = aws_api_gateway_rest_api.address_book_api.id
   stage_name   = "prod"
 }

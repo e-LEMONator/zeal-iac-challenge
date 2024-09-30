@@ -12,23 +12,17 @@ def lambda_handler(event, context):
     Main entry point for the Lambda function.
     Determines the HTTP method and calls the appropriate function.
     """
-    try:
-        # If the event body is a string, parse it as JSON
-        if isinstance(event['body'], str):
-            try:
-                event['body'] = json.loads(event['body'])
-            except json.JSONDecodeError as e:
-                return {
-                    'statusCode': 400,
-                    'body': json.dumps('Invalid JSON')
-                }
-    except KeyError:
-        return {
-            'statusCode': 400,
-            'body': json.dumps('Missing body in event')
-        }
+    body = event.get('body')
+    if isinstance(body, str):
+        try:
+            event['body'] = json.loads(body)
+        except json.JSONDecodeError:
+            return {
+                'statusCode': 400,
+                'body': json.dumps('Invalid JSON')
+            }
 
-    http_method = event['httpMethod']
+    http_method = event.get('httpMethod')
     if http_method == 'POST':
         return create_contact(event)
     elif http_method == 'GET':
@@ -47,12 +41,12 @@ def create_contact(event):
     """
     Handles the creation of a new contact.
     """
-    data = event['body']
+    data = event.get('body', {})
     try:
         response = table.put_item(Item={
-            'contact_id': data['contact_id'],
-            'name': data['name'],
-            'address': data['address'],
+            'contact_id': data.get('contact_id'),
+            'name': data.get('name'),
+            'address': data.get('address'),
             # other fields can be added here
         })
         return {
@@ -69,7 +63,8 @@ def get_contact(event):
     """
     Handles retrieving a contact by contact_id.
     """
-    contact_id = event['pathParameters']['contact_id']
+    data = event.get('body', {})
+    contact_id = data.get('contact_id')
     try:
         response = table.get_item(Key={'contact_id': contact_id})
         if 'Item' in response:
@@ -91,8 +86,8 @@ def update_contact(event):
     """
     Handles updating an existing contact by contact_id.
     """
-    contact_id = event['pathParameters']['contact_id']
-    data = event['body']
+    data = event.get('body', {})
+    contact_id = data.get('contact_id')
     try:
         response = table.update_item(
             Key={'contact_id': contact_id},
@@ -101,8 +96,8 @@ def update_contact(event):
                 '#name': 'name'
             },
             ExpressionAttributeValues={
-                ':name': data['name'],
-                ':address': data['address']
+                ':name': data.get('name'),
+                ':address': data.get('address')
             },
             ReturnValues="UPDATED_NEW"
         )
@@ -120,7 +115,8 @@ def delete_contact(event):
     """
     Handles deleting a contact by contact_id.
     """
-    contact_id = event['pathParameters']['contact_id']
+    data = event.get('body', {})
+    contact_id = data.get('contact_id')
     try:
         response = table.delete_item(Key={'contact_id': contact_id})
         return {
