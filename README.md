@@ -13,6 +13,8 @@ This project provides a serverless API for managing an address book using AWS La
 
 - `terraform/`: Contains Terraform configuration files
 - `lambda/`: Contains the Lambda function code
+- `windows_deploy.ps1`: Deployment script for Windows
+- `linux_deploy.sh`: Deployment script for Unix-based systems
 
 ## Setup Instructions
 
@@ -41,7 +43,20 @@ terraform plan
 terraform apply
 ```
 
-### 3. **Test the API endpoints**:
+### 3. **Use the Deployment Scripts**:
+**Windows**
+Open PowerShell and run the `windows_deploy.ps1` script:
+```sh
+.\windows_deploy.ps1
+```
+
+**Unix-based**
+Open a terminal and run the `linux_deploy.sh` script:
+```sh
+./linux_deploy.sh
+```
+
+### 4. **Test the API endpoints**:
 Use tools like Postman or curl to test the API endpoints.
 
 * GET `/contacts`: Retrieve a contact by `contact_id`
@@ -70,7 +85,7 @@ Use tools like Postman or curl to test the API endpoints.
     * Request Body: JSON object with `contact_id`
     * Example: `curl -X DELETE "https://<api-id>.execute-api.<region>.amazonaws.com/prod/contacts?contact_id=<contact_id>"`
 
-### 4. **Clean up the resources**:
+### 5. **Clean up the resources**:
 To clean up the resources created by Terraform, the following command in the `terraform/` directory::
 ```sh
 terraform destroy
