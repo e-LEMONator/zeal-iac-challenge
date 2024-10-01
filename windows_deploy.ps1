@@ -1,5 +1,5 @@
 # Check if running on Windows
-if ($IsWindows) {
+if ($([System.Environment]::OSVersion.Platform -eq 'Win32NT')) {
     Write-Output "Running on Windows"
 
     # Navigate to the lambda directory
@@ -12,7 +12,7 @@ if ($IsWindows) {
     Compress-Archive -Path * -DestinationPath ../lambda_function.zip -Force
 
     # Clean up the pip installed files
-    Get-ChildItem -Path . -Exclude "lambda_function.zip", "requirements.txt" | Remove-Item -Recurse -Force
+    Get-ChildItem -Path . -Exclude "lambda_function.zip", "requirements.txt", "lambda_function.py" | Remove-Item -Recurse -Force
 
     # Navigate to the terraform directory
     Set-Location -Path "../terraform"
