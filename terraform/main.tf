@@ -137,6 +137,9 @@ resource "aws_api_gateway_method" "get_method" {
   resource_id   = aws_api_gateway_resource.contacts.id
   http_method   = "GET"
   authorization = "NONE"
+  request_parameters = {
+    "method.request.querystring.contact_id" = true
+  }
 }
 
 # Integrate the Lambda function with the GET method
@@ -147,6 +150,9 @@ resource "aws_api_gateway_integration" "get_integration" {
   type                    = "AWS_PROXY"
   integration_http_method = "POST"
   uri                     = aws_lambda_function.crud_lambda.invoke_arn
+  request_parameters = {
+    "integration.request.querystring.contact_id" = "method.request.querystring.contact_id"
+  }
 }
 
 # Grant API Gateway permission to invoke the Lambda function for GET method

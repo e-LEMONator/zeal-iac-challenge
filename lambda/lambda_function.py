@@ -1,17 +1,24 @@
 import json
 import boto3
 import os
+import logging
 from botocore.exceptions import ClientError
 
 # Initialize DynamoDB resource and table
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(os.environ['DYNAMODB_TABLE'])
 
+# Setup Logging for Lambda to CloudWatch
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
 def lambda_handler(event, context):
     """
     Main entry point for the Lambda function.
     Determines the HTTP method and calls the appropriate function.
     """
+    logger.info(f"Received event: {event}")
+
     body = event.get('body')
     if isinstance(body, str):
         try:
@@ -63,8 +70,14 @@ def get_contact(event):
     """
     Handles retrieving a contact by contact_id.
     """
-    data = event.get('body', {})
-    contact_id = data.get('contact_id')
+    contact_id = event['queryStringParameters'].get('contact_id')
+
+    if not contact_id:
+        return {
+            'statusCode': 400,
+            'body': json.dumps('Missing contact_id')
+        }
+
     try:
         response = table.get_item(Key={'contact_id': contact_id})
         if 'Item' in response:
