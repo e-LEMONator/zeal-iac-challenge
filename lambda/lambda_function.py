@@ -49,13 +49,15 @@ def create_contact(event):
     Handles the creation of a new contact.
     """
     data = event.get('body', {})
+    contact_id = event['queryStringParameters'].get('contact_id')
+    if not contact_id:
+        return {
+            'statusCode': 400,
+            'body': json.dumps('Missing contact_id')
+        }
+    data['contact_id'] = contact_id
     try:
-        response = table.put_item(Item={
-            'contact_id': data.get('contact_id'),
-            'name': data.get('name'),
-            'address': data.get('address'),
-            # other fields can be added here
-        })
+        response = table.put_item(Item=data)
         return {
             'statusCode': 201,
             'body': json.dumps('Contact created')
@@ -71,13 +73,11 @@ def get_contact(event):
     Handles retrieving a contact by contact_id.
     """
     contact_id = event['queryStringParameters'].get('contact_id')
-
     if not contact_id:
         return {
             'statusCode': 400,
             'body': json.dumps('Missing contact_id')
         }
-
     try:
         response = table.get_item(Key={'contact_id': contact_id})
         if 'Item' in response:
@@ -100,7 +100,12 @@ def update_contact(event):
     Handles updating an existing contact by contact_id.
     """
     data = event.get('body', {})
-    contact_id = data.get('contact_id')
+    contact_id = event['queryStringParameters'].get('contact_id')
+    if not contact_id:
+        return {
+            'statusCode': 400,
+            'body': json.dumps('Missing contact_id')
+        }
     try:
         response = table.update_item(
             Key={'contact_id': contact_id},
@@ -128,8 +133,12 @@ def delete_contact(event):
     """
     Handles deleting a contact by contact_id.
     """
-    data = event.get('body', {})
-    contact_id = data.get('contact_id')
+    contact_id = event['queryStringParameters'].get('contact_id')
+    if not contact_id:
+        return {
+            'statusCode': 400,
+            'body': json.dumps('Missing contact_id')
+        }
     try:
         response = table.delete_item(Key={'contact_id': contact_id})
         return {

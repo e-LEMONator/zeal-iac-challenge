@@ -48,30 +48,27 @@ Use tools like Postman or curl to test the API endpoints.
     * Query Parameters: `contact_id`
     * Example: `curl -X GET "https://<api-id>.execute-api.<region>.amazonaws.com/prod/contacts?contact_id=<contact_id>"`
 * POST `/contacts`: Create a new contact
+    * Query Parameters: `contact_id`
     * Request Body: JSON object with `contact_id`, `name`, and `address`
-    * Example: `curl -X POST "https://<api-id>.execute-api.<region>.amazonaws.com/prod/contacts" \
+    * Example: `https://<api-id>.execute-api.<region>.amazonaws.com/prod/contacts?contact_id=<contact_id>" \
   -H "Content-Type: application/json" \
   -d '{
-        "contact_id": "123",
         "name": "John Doe",
         "address": "123 Main St"
       }'`
 *  PUT `/contacts`: Update an existing contact
+    * Query Parameters: `contact_id`
     * Request Body: JSON object with `contact_id`, `name`, and `address`
-    * Example: `curl -X PUT "https://<api-id>.execute-api.<region>.amazonaws.com/prod/contacts" \
+    * Example: `curl -X PUT "https://<api-id>.execute-api.<region>.amazonaws.com/prod/contacts?contact_id=<contact_id>" \
   -H "Content-Type: application/json" \
   -d '{
-        "contact_id": "123",
-        "name": "Jane Doe",
-        "address": "456 Elm St"
+        "name": "John Doe Updated",
+        "address": "456 Main St"
       }'`
 * DELETE `/contacts`: Delete a contact by `contact_id`
+    * Query Parameters: `contact_id`
     * Request Body: JSON object with `contact_id`
-    * Example: `curl -X DELETE "https://<api-id>.execute-api.<region>.amazonaws.com/prod/contacts" \
-  -H "Content-Type: application/json" \
-  -d '{
-        "contact_id": "123"
-      }'`
+    * Example: `curl -X DELETE "https://<api-id>.execute-api.<region>.amazonaws.com/prod/contacts?contact_id=<contact_id>"`
 
 ### 4. **Clean up the resources**:
 To clean up the resources created by Terraform, the following command in the `terraform/` directory::

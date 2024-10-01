@@ -164,9 +164,114 @@ resource "aws_lambda_permission" "api_gateway_permission_get" {
   source_arn    = "${aws_api_gateway_rest_api.address_book_api.execution_arn}/*/GET/contacts"
 }
 
+# Create a POST method for the /contacts endpoint
+resource "aws_api_gateway_method" "post_method" {
+  rest_api_id   = aws_api_gateway_rest_api.address_book_api.id
+  resource_id   = aws_api_gateway_resource.contacts.id
+  http_method   = "POST"
+  authorization = "NONE"
+  request_parameters = {
+    "method.request.querystring.contact_id" = true
+  }
+}
+
+# Integrate the Lambda function with the POST method
+resource "aws_api_gateway_integration" "post_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.address_book_api.id
+  resource_id             = aws_api_gateway_resource.contacts.id
+  http_method             = aws_api_gateway_method.post_method.http_method
+  type                    = "AWS_PROXY"
+  integration_http_method = "POST"
+  uri                     = aws_lambda_function.crud_lambda.invoke_arn
+  request_parameters = {
+    "integration.request.querystring.contact_id" = "method.request.querystring.contact_id"
+  }
+}
+
+# Grant API Gateway permission to invoke the Lambda function for POST method
+resource "aws_lambda_permission" "api_gateway_permission_post" {
+  statement_id  = "AllowAPIGatewayInvokePost"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.crud_lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.address_book_api.execution_arn}/*/POST/contacts"
+}
+
+# Create a PUT method for the /contacts endpoint
+resource "aws_api_gateway_method" "put_method" {
+  rest_api_id   = aws_api_gateway_rest_api.address_book_api.id
+  resource_id   = aws_api_gateway_resource.contacts.id
+  http_method   = "PUT"
+  authorization = "NONE"
+  request_parameters = {
+    "method.request.querystring.contact_id" = true
+  }
+}
+
+# Integrate the Lambda function with the PUT method
+resource "aws_api_gateway_integration" "put_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.address_book_api.id
+  resource_id             = aws_api_gateway_resource.contacts.id
+  http_method             = aws_api_gateway_method.put_method.http_method
+  type                    = "AWS_PROXY"
+  integration_http_method = "POST"
+  uri                     = aws_lambda_function.crud_lambda.invoke_arn
+  request_parameters = {
+    "integration.request.querystring.contact_id" = "method.request.querystring.contact_id"
+  }
+}
+
+# Grant API Gateway permission to invoke the Lambda function for PUT method
+resource "aws_lambda_permission" "api_gateway_permission_put" {
+  statement_id  = "AllowAPIGatewayInvokePut"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.crud_lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.address_book_api.execution_arn}/*/PUT/contacts"
+}
+
+# Create a DELETE method for the /contacts endpoint
+resource "aws_api_gateway_method" "delete_method" {
+  rest_api_id   = aws_api_gateway_rest_api.address_book_api.id
+  resource_id   = aws_api_gateway_resource.contacts.id
+  http_method   = "DELETE"
+  authorization = "NONE"
+  request_parameters = {
+    "method.request.querystring.contact_id" = true
+  }
+}
+
+# Integrate the Lambda function with the DELETE method
+resource "aws_api_gateway_integration" "delete_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.address_book_api.id
+  resource_id             = aws_api_gateway_resource.contacts.id
+  http_method             = aws_api_gateway_method.delete_method.http_method
+  type                    = "AWS_PROXY"
+  integration_http_method = "POST"
+  uri                     = aws_lambda_function.crud_lambda.invoke_arn
+  request_parameters = {
+    "integration.request.querystring.contact_id" = "method.request.querystring.contact_id"
+  }
+}
+
+# Grant API Gateway permission to invoke the Lambda function for DELETE method
+resource "aws_lambda_permission" "api_gateway_permission_delete" {
+  statement_id  = "AllowAPIGatewayInvokeDelete"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.crud_lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.address_book_api.execution_arn}/*/DELETE/contacts"
+}
+
 # Deploy the API Gateway
 resource "aws_api_gateway_deployment" "deployment" {
-  depends_on   = [aws_api_gateway_integration.lambda_integration, aws_api_gateway_integration.get_integration]
+  depends_on   = [
+    aws_api_gateway_integration.lambda_integration,
+    aws_api_gateway_integration.get_integration,
+    aws_api_gateway_integration.post_integration,
+    aws_api_gateway_integration.put_integration,
+    aws_api_gateway_integration.delete_integration
+  ]
   rest_api_id  = aws_api_gateway_rest_api.address_book_api.id
   stage_name   = "prod"
 }
