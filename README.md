@@ -64,7 +64,7 @@ Use tools like Postman or curl to test the API endpoints.
     * Example: `curl -X GET "https://<api-id>.execute-api.<region>.amazonaws.com/prod/contacts?contact_id=<contact_id>"`
 * POST `/contacts`: Create a new contact
     * Query Parameters: `contact_id`
-    * Request Body: JSON object with `contact_id`, `name`, and `address`
+    * Request Body: JSON object with `name`, and `address`
     * Example: `https://<api-id>.execute-api.<region>.amazonaws.com/prod/contacts?contact_id=<contact_id>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -73,7 +73,7 @@ Use tools like Postman or curl to test the API endpoints.
       }'`
 *  PUT `/contacts`: Update an existing contact
     * Query Parameters: `contact_id`
-    * Request Body: JSON object with `contact_id`, `name`, and `address`
+    * Request Body: JSON object with `name`, and `address`
     * Example: `curl -X PUT "https://<api-id>.execute-api.<region>.amazonaws.com/prod/contacts?contact_id=<contact_id>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -82,7 +82,6 @@ Use tools like Postman or curl to test the API endpoints.
       }'`
 * DELETE `/contacts`: Delete a contact by `contact_id`
     * Query Parameters: `contact_id`
-    * Request Body: JSON object with `contact_id`
     * Example: `curl -X DELETE "https://<api-id>.execute-api.<region>.amazonaws.com/prod/contacts?contact_id=<contact_id>"`
 
 ### 5. **Clean up the resources**:
